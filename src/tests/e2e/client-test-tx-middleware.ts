@@ -164,6 +164,12 @@ test('Test Signed Eth Tx Middleware Type 1', async t => {
       '0x1',
       `SimpleStore.set should return correct status for address (to) ${ethAddress}`
     )
+
+    t.equal(
+      tx1.events.NewValueSet.returnValues.sender,
+      ethAddress,
+      'Sender should be same on contract'
+    )
   } catch (err) {
     console.error(err)
     t.fail(err.message)
