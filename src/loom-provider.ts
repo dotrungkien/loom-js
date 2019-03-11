@@ -198,6 +198,10 @@ export class LoomProvider {
     this._accountMiddlewares.set(address.toLowerCase(), middlewares)
   }
 
+  get accountMiddlewares(): Map<string, Array<ITxMiddlewareHandler>> {
+    return this._accountMiddlewares
+  }
+
   // PUBLIC FUNCTION TO SUPPORT WEB3
 
   on(type: string, callback: any) {

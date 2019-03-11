@@ -150,6 +150,7 @@ test('Test Signed Eth Tx Middleware Type 1', async t => {
       createTestHttpClient
     )
 
+    // Get address of the account 0 = 0x90f8bf6a479f320ead074411a4b0e7944ea8c9c1
     const ethAddress = await signer.getAddress()
 
     // Ethereum account needs his on middlewares
@@ -158,7 +159,12 @@ test('Test Signed Eth Tx Middleware Type 1', async t => {
       new SignedEthTxMiddleware(signer)
     ])
 
+    const middlewaresUsed = loomProvider.accountMiddlewares.get(ethAddress.toLowerCase())
+    t.assert(middlewaresUsed![0] instanceof NonceEthTxMiddleware, 'NonceEthMiddleware used')
+    t.assert(middlewaresUsed![1] instanceof SignedEthTxMiddleware, 'SignedEthTxMiddleware used')
+
     let tx1 = await contract.methods.set(1).send({ from: ethAddress })
+
     t.equal(
       tx1.status,
       '0x1',
