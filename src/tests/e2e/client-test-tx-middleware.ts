@@ -1,6 +1,6 @@
 import test from 'tape'
 
-import { CachedNonceTxMiddleware, CryptoUtils, Client, Contracts } from '../../index'
+import { CachedNonceTxMiddleware, CryptoUtils, Client, NonceEthTxMiddleware } from '../../index'
 
 import { LoomProvider } from '../../loom-provider'
 import { deployContract } from '../evm-helpers'
@@ -52,7 +52,6 @@ async function bootstrapTest(
   createClient: () => Client
 ): Promise<{
   client: Client
-  addressMapper: Contracts.AddressMapper
   pubKey: Uint8Array
   privKey: Uint8Array
   signer: ethers.Signer
@@ -139,16 +138,10 @@ async function bootstrapTest(
     from: LocalAddress.fromPublicKey(pubKey).toString()
   })
 
-  // Create address mapper instance
-  const addressMapper = await Contracts.AddressMapper.createAsync(
-    client,
-    new Address(client.chainId, LocalAddress.fromPublicKey(pubKey))
-  )
-
   // And get the signer
   const signer = getEthersSigner()
 
-  return { client, addressMapper, pubKey, privKey, signer, loomProvider, contract, ABI }
+  return { client, pubKey, privKey, signer, loomProvider, contract, ABI }
 }
 
 test('Test Signed Eth Tx Middleware Type 1', async t => {
@@ -160,10 +153,10 @@ test('Test Signed Eth Tx Middleware Type 1', async t => {
     const ethAddress = await signer.getAddress()
 
     // Ethereum account needs his on middlewares
-    client.txMiddleware = [
-      new CachedNonceTxMiddleware(pubKey, client),
+    loomProvider.setMiddlewaresForAddress(ethAddress, [
+      new NonceEthTxMiddleware(ethAddress, client),
       new SignedEthTxMiddleware(signer)
-    ]
+    ])
 
     let tx1 = await contract.methods.set(1).send({ from: ethAddress })
     t.equal(

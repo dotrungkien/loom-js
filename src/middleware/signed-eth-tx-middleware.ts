@@ -40,12 +40,12 @@ export class SignedEthTxMiddleware implements ITxMiddlewareHandler {
         value: toAddress
       },
       {
-        type: 'uint256',
+        type: 'uint64',
         value: sequence // nonce
       },
       {
         type: 'bytes',
-        value: `0x${bytesToHex(txData as Uint8Array)}`
+        value: bytesToHex(txData as Uint8Array)
       }
     ]
 
@@ -79,6 +79,8 @@ export class SignedEthTxMiddleware implements ITxMiddlewareHandler {
       `0x${bytesToHex(sig.slice(1))}`
     )
 
+    log('Public key found', publicKey)
+
     // Check if we're generating the right public key
     if (ethers.utils.computeAddress(publicKey) !== this.fromAddress) {
       throw Error("Public key generated isn't valid")
@@ -88,7 +90,6 @@ export class SignedEthTxMiddleware implements ITxMiddlewareHandler {
     signedTx.setInner(txData as Uint8Array)
     signedTx.setSignature(sig)
     signedTx.setPublicKey(hexToBytes(publicKey))
-    signedTx.setChainname('eth')
     return Promise.resolve(signedTx.serializeBinary())
   }
 }

@@ -194,8 +194,8 @@ export class LoomProvider {
    * @param middlewares Array of middlewares for the address
    */
   setMiddlewaresForAddress(address: string, middlewares: Array<ITxMiddlewareHandler>) {
-    this.accounts.set(address, null)
-    this._accountMiddlewares.set(address, middlewares)
+    this.accounts.set(address.toLowerCase(), null)
+    this._accountMiddlewares.set(address.toLowerCase(), middlewares)
   }
 
   // PUBLIC FUNCTION TO SUPPORT WEB3

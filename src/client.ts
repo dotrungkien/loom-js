@@ -703,13 +703,28 @@ export class Client extends EventEmitter {
   /**
    * Gets a nonce for the given public key.
    *
-   * This should only be called by NonceTxMiddleware.
+   * This should only be called by middlewares.
    *
    * @param key A hex encoded public key.
    * @return The nonce.
    */
   async getNonceAsync(key: string): Promise<number> {
     return parseInt(await this._writeClient.sendAsync<string>('nonce', { key }), 10)
+  }
+
+  /**
+   * Gets a nonce for the given chain id and local address.
+   *
+   * This should only be called by middlewares.
+   *
+   * @param chainId chainId as string
+   * @param localAddr local address in hex
+   */
+  async getNonce2Async(chainId: string, localAddr: string): Promise<number> {
+    return parseInt(
+      await this._writeClient.sendAsync<string>('nonce2', { chainId, localAddr }),
+      10
+    )
   }
 
   /**
